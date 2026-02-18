@@ -1,6 +1,6 @@
 // Pomodoro Timer – config (easily changeable for production)
-const WORK_DURATION_SEC = 60;   // 1 min for testing
-const BREAK_DURATION_SEC = 60; // 1 min for testing
+const WORK_DURATION_SEC = 1500;   // 1 min for testing
+const BREAK_DURATION_SEC = 300; // 1 min for testing
 
 // State
 let timeRemaining = WORK_DURATION_SEC; // seconds
