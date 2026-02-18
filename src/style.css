@@ -19,6 +19,10 @@
   --color-break-muted: rgba(78, 205, 196, 0.25);
   --color-break-glow: rgba(78, 205, 196, 0.15);
 
+  /* Paused state */
+  --color-paused: #8b8b96;
+  --color-paused-muted: rgba(139, 139, 150, 0.35);
+
   /* Semantic */
   --color-success: #5cb85c;
   --color-warning: #f0ad4e;
@@ -125,6 +129,22 @@ body {
 
 #app[data-mode="break"] .time-display {
   color: var(--color-break);
+}
+
+#app[data-mode="paused"] .mode-indicator {
+  color: var(--color-paused-muted);
+}
+
+#app[data-mode="paused"] .time-display {
+  color: var(--color-paused);
+}
+
+#app[data-mode="paused"] .control-button--primary {
+  background-color: var(--color-paused);
+}
+
+#app[data-mode="paused"] .control-button--primary:hover {
+  background-color: #9e9ea8;
 }
 
 .timer-controls {
