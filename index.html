@@ -10,7 +10,16 @@
     <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app">
+        <main class="pomodoro-timer" role="timer" aria-label="Pomodoro timer">
+            <p class="mode-indicator" id="mode-indicator" aria-live="polite">Focus</p>
+            <output class="time-display" id="time-display" for="timer" aria-live="polite">25:00</output>
+            <div class="timer-controls">
+                <button type="button" class="control-button control-button--primary" id="start-pause-btn" aria-label="Start timer">Start</button>
+                <button type="button" class="control-button control-button--secondary" id="reset-btn" aria-label="Reset timer">Reset</button>
+            </div>
+        </main>
+    </div>
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
