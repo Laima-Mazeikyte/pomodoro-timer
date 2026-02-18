@@ -1,1 +1,99 @@
-/* We'll add our styles here */
+/* Pomodoro Timer – Design tokens */
+
+:root {
+  /* ----- Colors (dark theme) ----- */
+  --color-bg: #0f0f12;
+  --color-surface: #18181c;
+  --color-surface-elevated: #222228;
+  --color-text: #f0f0f4;
+  --color-text-muted: #8b8b96;
+  --color-border: #2a2a32;
+
+  /* Work mode (focus) */
+  --color-work: #e85d5d;
+  --color-work-muted: rgba(232, 93, 93, 0.25);
+  --color-work-glow: rgba(232, 93, 93, 0.15);
+
+  /* Break mode (rest) */
+  --color-break: #4ecdc4;
+  --color-break-muted: rgba(78, 205, 196, 0.25);
+  --color-break-glow: rgba(78, 205, 196, 0.15);
+
+  /* Semantic */
+  --color-success: #5cb85c;
+  --color-warning: #f0ad4e;
+  --color-error: #d9534f;
+
+  /* ----- Spacing scale ----- */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+
+  /* ----- Typography ----- */
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-timer: 5rem;    /* 80px – main timer display */
+  --text-timer-sm: 3rem; /* 48px – compact timer */
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* ----- Border radius ----- */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-full: 9999px;  /* pill / circle */
+}
+
+/* ----- Reset ----- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ----- Base ----- */
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+}
+
+#app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+/* ----- Focus (accessibility) ----- */
+:focus-visible {
+  outline: 2px solid var(--color-work);
+  outline-offset: 2px;
+}
