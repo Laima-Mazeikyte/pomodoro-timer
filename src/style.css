@@ -92,6 +92,90 @@ body {
   padding: var(--space-lg);
 }
 
+/* ----- Timer components ----- */
+.pomodoro-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
+.mode-indicator {
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  color: var(--color-work-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.time-display {
+  font-family: var(--font-mono);
+  font-size: var(--text-timer);
+  font-weight: var(--font-medium);
+  line-height: var(--leading-tight);
+  color: var(--color-work);
+  letter-spacing: 0.02em;
+}
+
+/* Mode-specific theme (data-mode set on #app from JavaScript) */
+#app[data-mode="break"] .mode-indicator {
+  color: var(--color-break-muted);
+}
+
+#app[data-mode="break"] .time-display {
+  color: var(--color-break);
+}
+
+.timer-controls {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.control-button {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.control-button:active {
+  transform: scale(0.98);
+}
+
+.control-button--primary {
+  background-color: var(--color-work);
+  color: var(--color-text);
+}
+
+.control-button--primary:hover {
+  background-color: #ef6b6b;
+}
+
+#app[data-mode="break"] .control-button--primary {
+  background-color: var(--color-break);
+}
+
+#app[data-mode="break"] .control-button--primary:hover {
+  background-color: #5fd9d1;
+}
+
+.control-button--secondary {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.control-button--secondary:hover {
+  color: var(--color-text);
+  background-color: var(--color-border);
+}
+
 /* ----- Focus (accessibility) ----- */
 :focus-visible {
   outline: 2px solid var(--color-work);
