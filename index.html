@@ -11,31 +11,68 @@
 </head>
 <body>
     <div id="app">
-        <main class="pomodoro-timer" role="timer" aria-label="Pomodoro timer">
-            <div class="pomodoro-timer__header">
-                <p class="mode-indicator" id="mode-indicator" aria-live="polite">Focus</p>
-                <button type="button" class="control-button control-button--secondary settings-btn" id="settings-btn" aria-label="Settings">&#9881;</button>
+        <div class="pomodoro-timer-wrapper">
+            <main class="pomodoro-timer" role="timer" aria-label="Pomodoro timer">
+                <div class="pomodoro-timer__header">
+                    <p class="mode-indicator" id="mode-indicator" aria-live="polite">Focus</p>
+                </div>
+                <output class="time-display" id="time-display" for="timer" aria-live="polite">25:00</output>
+                <div class="timer-controls">
+                    <button type="button" class="control-button control-button--primary control-button--icon" id="start-pause-btn" aria-label="Start timer">
+                        <span class="control-button__icon control-button__icon--play" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M8 5v14l11-7L8 5z"/></svg>
+                        </span>
+                        <span class="control-button__icon control-button__icon--pause" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </span>
+                    </button>
+                    <button type="button" class="control-button control-button--secondary control-button--icon" id="reset-btn" aria-label="Reset timer" hidden>
+                        <span class="control-button__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                        </span>
+                    </button>
+                    <button type="button" class="control-button control-button--secondary control-button--icon settings-btn" id="settings-btn" aria-label="Settings">
+                        <span class="control-button__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        </span>
+                    </button>
+                </div>
+            </main>
+            <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-heading">
+            <h2 id="settings-heading" class="visually-hidden">Timer settings</h2>
+            <div class="settings-panel__group" role="group" aria-labelledby="focus-label">
+                <span class="settings-panel__label-text" id="focus-label">Focus time (minutes)</span>
+                <div class="settings-panel__presets" role="group" aria-label="Focus duration presets">
+                    <button type="button" class="settings-panel__preset" data-focus-preset="25" aria-pressed="false">25</button>
+                    <button type="button" class="settings-panel__preset" data-focus-preset="30" aria-pressed="false">30</button>
+                    <button type="button" class="settings-panel__preset" data-focus-preset="45" aria-pressed="false">45</button>
+                    <button type="button" class="settings-panel__preset" data-focus-preset="60" aria-pressed="false">60</button>
+                    <button type="button" class="settings-panel__preset settings-panel__preset--custom" data-focus-custom aria-pressed="false">Custom</button>
+                </div>
+                <div id="focus-custom-wrap" hidden>
+                    <label class="settings-panel__label visually-hidden" for="focus-min-input">Focus duration (minutes)</label>
+                    <input type="number" id="focus-min-input" min="1" max="999" value="25" class="settings-panel__input" aria-label="Focus duration (minutes)">
+                </div>
             </div>
-            <output class="time-display" id="time-display" for="timer" aria-live="polite">25:00</output>
-            <div class="timer-controls">
-                <button type="button" class="control-button control-button--primary" id="start-pause-btn" aria-label="Start timer">Start</button>
-                <button type="button" class="control-button control-button--secondary" id="reset-btn" aria-label="Reset timer">Reset</button>
+            <div class="settings-panel__group" role="group" aria-labelledby="break-label">
+                <span class="settings-panel__label-text" id="break-label">Break time (minutes)</span>
+                <div class="settings-panel__presets" role="group" aria-label="Break duration presets">
+                    <button type="button" class="settings-panel__preset" data-break-preset="5" aria-pressed="false">5</button>
+                    <button type="button" class="settings-panel__preset" data-break-preset="10" aria-pressed="false">10</button>
+                    <button type="button" class="settings-panel__preset" data-break-preset="15" aria-pressed="false">15</button>
+                    <button type="button" class="settings-panel__preset" data-break-preset="20" aria-pressed="false">20</button>
+                    <button type="button" class="settings-panel__preset settings-panel__preset--custom" data-break-custom aria-pressed="false">Custom</button>
+                </div>
+                <div id="break-custom-wrap" hidden>
+                    <label class="settings-panel__label visually-hidden" for="break-min-input">Break duration (minutes)</label>
+                    <input type="number" id="break-min-input" min="1" max="999" value="5" class="settings-panel__input" aria-label="Break duration (minutes)">
+                </div>
             </div>
-        </main>
-        <div class="settings-panel" id="settings-panel" hidden>
-            <h2 class="settings-panel__title">Timer settings</h2>
-            <label class="settings-panel__label">
-                Focus (minutes)
-                <input type="number" id="focus-min-input" min="1" max="90" value="25" class="settings-panel__input">
-            </label>
-            <label class="settings-panel__label">
-                Break (minutes)
-                <input type="number" id="break-min-input" min="1" max="30" value="5" class="settings-panel__input">
-            </label>
             <div class="settings-panel__actions">
                 <button type="button" class="control-button control-button--primary" id="settings-save-btn">Save</button>
                 <button type="button" class="control-button control-button--secondary" id="settings-cancel-btn">Cancel</button>
             </div>
+        </section>
         </div>
     </div>
     <script type="module" src="/src/main.js"></script>

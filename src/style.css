@@ -1,27 +1,27 @@
 /* Pomodoro Timer – Design tokens */
 
 :root {
-  /* ----- Colors (dark theme) ----- */
-  --color-bg: #0f0f12;
-  --color-surface: #18181c;
-  --color-surface-elevated: #222228;
+  /* ----- Colors (dark theme, default = Focus) ----- */
+  --color-bg: #1c1912;
+  --color-surface: #252218;
+  --color-surface-elevated: #2f2a1f;
   --color-text: #f0f0f4;
   --color-text-muted: #8b8b96;
-  --color-border: #2a2a32;
+  --color-border: #3d3829;
 
-  /* Work mode (focus) */
-  --color-work: #e85d5d;
-  --color-work-muted: rgba(232, 93, 93, 0.25);
-  --color-work-glow: rgba(232, 93, 93, 0.15);
+  /* Work mode (focus) – bright yellow */
+  --color-work: #f5c542;
+  --color-work-muted: rgba(245, 197, 66, 0.35);
+  --color-work-glow: rgba(245, 197, 66, 0.15);
 
-  /* Break mode (rest) */
-  --color-break: #4ecdc4;
-  --color-break-muted: rgba(78, 205, 196, 0.25);
-  --color-break-glow: rgba(78, 205, 196, 0.15);
+  /* Break mode (rest) – calm mossy green */
+  --color-break: #6b8e6b;
+  --color-break-muted: rgba(107, 142, 107, 0.35);
+  --color-break-glow: rgba(107, 142, 107, 0.15);
 
-  /* Paused state */
-  --color-paused: #8b8b96;
-  --color-paused-muted: rgba(139, 139, 150, 0.35);
+  /* Paused state – bluish gray */
+  --color-paused: #7b9bb3;
+  --color-paused-muted: rgba(123, 155, 179, 0.35);
 
   /* Semantic */
   --color-success: #5cb85c;
@@ -64,6 +64,28 @@
   --radius-lg: 0.75rem;   /* 12px */
   --radius-xl: 1rem;      /* 16px */
   --radius-full: 9999px;  /* pill / circle */
+}
+
+/* Per-state background and section colors (same family as accent) */
+body[data-mode="work"] {
+  --color-bg: #1c1912;
+  --color-surface: #252218;
+  --color-surface-elevated: #2f2a1f;
+  --color-border: #3d3829;
+}
+
+body[data-mode="break"] {
+  --color-bg: #121a14;
+  --color-surface: #1a2420;
+  --color-surface-elevated: #243028;
+  --color-border: #2e3d36;
+}
+
+body[data-mode="paused"] {
+  --color-bg: #13181c;
+  --color-surface: #1a2128;
+  --color-surface-elevated: #242d36;
+  --color-border: #2d3842;
 }
 
 /* ----- Reset ----- */
@@ -163,13 +185,50 @@ body {
 }
 
 #app[data-mode="paused"] .control-button--primary:hover {
-  background-color: #9e9ea8;
+  background-color: #8fa9be;
 }
 
 .timer-controls {
   display: flex;
   gap: var(--space-md);
   margin-top: var(--space-sm);
+  align-items: center;
+}
+
+.control-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-button__icon[hidden] {
+  display: none !important;
+}
+
+.control-button__icon svg {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Play/Pause: show only one icon at a time via state class */
+.control-button__icon--pause {
+  display: none;
+}
+
+#start-pause-btn.is-running .control-button__icon--play {
+  display: none;
+}
+
+#start-pause-btn.is-running .control-button__icon--pause {
+  display: inline-flex;
+}
+
+/* Icon-only buttons: same shape as Settings (Play/Pause, Reset, Settings) */
+.control-button--icon,
+.settings-btn {
+  padding: var(--space-sm);
+  min-width: 2.5rem;
 }
 
 .control-button {
@@ -193,7 +252,7 @@ body {
 }
 
 .control-button--primary:hover {
-  background-color: #ef6b6b;
+  background-color: #f7d054;
 }
 
 #app[data-mode="break"] .control-button--primary {
@@ -201,7 +260,7 @@ body {
 }
 
 #app[data-mode="break"] .control-button--primary:hover {
-  background-color: #5fd9d1;
+  background-color: #7fa87f;
 }
 
 .control-button--secondary {
@@ -213,11 +272,6 @@ body {
 .control-button--secondary:hover {
   color: var(--color-text);
   background-color: var(--color-border);
-}
-
-.settings-btn {
-  padding: var(--space-sm);
-  min-width: 2.5rem;
 }
 
 /* ----- Settings panel ----- */

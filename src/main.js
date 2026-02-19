@@ -4,9 +4,11 @@ const BREAK_STORAGE_KEY = 'pomodoro-break-min';
 const DEFAULT_FOCUS_MIN = 25;
 const DEFAULT_BREAK_MIN = 5;
 const FOCUS_MIN = 1;
-const FOCUS_MAX = 90;
+const FOCUS_MAX = 999;
 const BREAK_MIN = 1;
-const BREAK_MAX = 30;
+const BREAK_MAX = 999;
+const FOCUS_PRESETS = [60, 30, 45, 25, 20];
+const BREAK_PRESETS = [5, 10, 15, 20];
 
 let workDurationSec = DEFAULT_FOCUS_MIN * 60;
 let breakDurationSec = DEFAULT_BREAK_MIN * 60;
@@ -34,6 +36,7 @@ let timeRemaining = workDurationSec; // seconds
 let isRunning = false;
 let currentMode = 'work'; // 'work' | 'break'
 let intervalId = null;
+let hasStarted = false; // true after user has pressed Play at least once
 
 // DOM
 const app = document.getElementById('app');
@@ -50,6 +53,8 @@ const settingsBtn = document.getElementById('settings-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const focusMinInput = document.getElementById('focus-min-input');
 const breakMinInput = document.getElementById('break-min-input');
+const focusCustomWrap = document.getElementById('focus-custom-wrap');
+const breakCustomWrap = document.getElementById('break-custom-wrap');
 const settingsSaveBtn = document.getElementById('settings-save-btn');
 const settingsCancelBtn = document.getElementById('settings-cancel-btn');
 
@@ -112,6 +117,7 @@ function restoreFullView() {
 export function setMode(mode) {
   if (mode === 'work' || mode === 'break' || mode === 'paused') {
     app.dataset.mode = mode;
+    document.body.dataset.mode = mode;
   }
 }
 
@@ -138,8 +144,17 @@ function updateDOM() {
   const displayMode = isRunning ? currentMode : 'paused';
   setMode(displayMode);
   modeIndicator.textContent = getModeLabel(currentMode);
-  startPauseBtn.textContent = isRunning ? 'Pause' : 'Start';
+
+  // Start/Pause: swap icon by state (only play or only pause visible)
+  startPauseBtn.classList.toggle('is-running', isRunning);
   startPauseBtn.setAttribute('aria-label', isRunning ? 'Pause timer' : 'Start timer');
+
+  // Reset: visible only after user has started the timer; when hidden, keep out of focus order
+  if (resetBtn) {
+    resetBtn.hidden = !hasStarted;
+    resetBtn.setAttribute('aria-hidden', hasStarted ? 'false' : 'true');
+    resetBtn.tabIndex = hasStarted ? 0 : -1;
+  }
 
   broadcastState();
 }
@@ -166,6 +181,7 @@ function tick() {
 function toggleStartPause() {
   isRunning = !isRunning;
   if (isRunning) {
+    hasStarted = true;
     intervalId = setInterval(tick, 1000);
   } else {
     clearInterval(intervalId);
@@ -177,6 +193,7 @@ function toggleStartPause() {
 
 /** Stop timer and reset to work mode with full work duration. */
 function reset() {
+  hasStarted = false;
   isRunning = false;
   if (intervalId) {
     clearInterval(intervalId);
@@ -185,9 +202,78 @@ function reset() {
   startPhase('work');
 }
 
+function setCustomInputFocusable(input, focusable) {
+  if (!input) return;
+  if (focusable) {
+    input.removeAttribute('tabindex');
+    input.removeAttribute('aria-hidden');
+  } else {
+    input.setAttribute('tabindex', '-1');
+    input.setAttribute('aria-hidden', 'true');
+  }
+}
+
+function selectFocusPreset(minutes) {
+  const val = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, minutes));
+  if (focusMinInput) focusMinInput.value = val;
+  if (focusCustomWrap) focusCustomWrap.hidden = true;
+  setCustomInputFocusable(focusMinInput, false);
+  settingsPanel.querySelectorAll('[data-focus-preset], [data-focus-custom]').forEach((btn) => {
+    const isPreset = btn.hasAttribute('data-focus-preset');
+    const match = isPreset && Number(btn.getAttribute('data-focus-preset')) === val;
+    const isCustom = btn.hasAttribute('data-focus-custom');
+    btn.setAttribute('aria-pressed', (!isCustom && match) || (isCustom && !FOCUS_PRESETS.includes(val)) ? 'true' : 'false');
+  });
+}
+
+function selectFocusCustom() {
+  if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, Math.round(workDurationSec / 60) || DEFAULT_FOCUS_MIN));
+  if (focusCustomWrap) focusCustomWrap.hidden = false;
+  setCustomInputFocusable(focusMinInput, true);
+  settingsPanel.querySelectorAll('[data-focus-preset], [data-focus-custom]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', btn.hasAttribute('data-focus-custom') ? 'true' : 'false');
+  });
+  focusMinInput?.focus();
+}
+
+function selectBreakPreset(minutes) {
+  const val = Math.max(BREAK_MIN, Math.min(BREAK_MAX, minutes));
+  if (breakMinInput) breakMinInput.value = val;
+  if (breakCustomWrap) breakCustomWrap.hidden = true;
+  setCustomInputFocusable(breakMinInput, false);
+  settingsPanel.querySelectorAll('[data-break-preset], [data-break-custom]').forEach((btn) => {
+    const isPreset = btn.hasAttribute('data-break-preset');
+    const match = isPreset && Number(btn.getAttribute('data-break-preset')) === val;
+    const isCustom = btn.hasAttribute('data-break-custom');
+    btn.setAttribute('aria-pressed', (!isCustom && match) || (isCustom && !BREAK_PRESETS.includes(val)) ? 'true' : 'false');
+  });
+}
+
+function selectBreakCustom() {
+  if (breakMinInput) breakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, Math.round(breakDurationSec / 60) || DEFAULT_BREAK_MIN));
+  if (breakCustomWrap) breakCustomWrap.hidden = false;
+  setCustomInputFocusable(breakMinInput, true);
+  settingsPanel.querySelectorAll('[data-break-preset], [data-break-custom]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', btn.hasAttribute('data-break-custom') ? 'true' : 'false');
+  });
+  breakMinInput?.focus();
+}
+
 function openSettings() {
-  if (focusMinInput) focusMinInput.value = Math.round(workDurationSec / 60);
-  if (breakMinInput) breakMinInput.value = Math.round(breakDurationSec / 60);
+  const focusMin = Math.round(workDurationSec / 60);
+  const breakMin = Math.round(breakDurationSec / 60);
+  if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, focusMin));
+  if (breakMinInput) breakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, breakMin));
+  if (FOCUS_PRESETS.includes(focusMin)) {
+    selectFocusPreset(focusMin);
+  } else {
+    selectFocusCustom();
+  }
+  if (BREAK_PRESETS.includes(breakMin)) {
+    selectBreakPreset(breakMin);
+  } else {
+    selectBreakCustom();
+  }
   if (settingsPanel) settingsPanel.hidden = false;
 }
 
@@ -221,6 +307,20 @@ if (restoreBtn) restoreBtn.addEventListener('click', restoreFullView);
 if (settingsBtn) settingsBtn.addEventListener('click', toggleSettings);
 if (settingsSaveBtn) settingsSaveBtn.addEventListener('click', saveSettings);
 if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettings);
+if (settingsPanel) {
+  settingsPanel.addEventListener('click', (e) => {
+    const target = e.target.closest('button');
+    if (!target || !target.classList.contains('settings-panel__preset')) return;
+    const focusPreset = target.getAttribute('data-focus-preset');
+    const focusCustom = target.hasAttribute('data-focus-custom');
+    const breakPreset = target.getAttribute('data-break-preset');
+    const breakCustom = target.hasAttribute('data-break-custom');
+    if (focusPreset != null) selectFocusPreset(Number(focusPreset));
+    else if (focusCustom) selectFocusCustom();
+    else if (breakPreset != null) selectBreakPreset(Number(breakPreset));
+    else if (breakCustom) selectBreakCustom();
+  });
+}
 
 // Optional: save popup position when it closes (popup would need to postMessage; skip for simplicity)
 
