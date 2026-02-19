@@ -12,13 +12,31 @@
 <body>
     <div id="app">
         <main class="pomodoro-timer" role="timer" aria-label="Pomodoro timer">
-            <p class="mode-indicator" id="mode-indicator" aria-live="polite">Focus</p>
+            <div class="pomodoro-timer__header">
+                <p class="mode-indicator" id="mode-indicator" aria-live="polite">Focus</p>
+                <button type="button" class="control-button control-button--secondary settings-btn" id="settings-btn" aria-label="Settings">&#9881;</button>
+            </div>
             <output class="time-display" id="time-display" for="timer" aria-live="polite">25:00</output>
             <div class="timer-controls">
                 <button type="button" class="control-button control-button--primary" id="start-pause-btn" aria-label="Start timer">Start</button>
                 <button type="button" class="control-button control-button--secondary" id="reset-btn" aria-label="Reset timer">Reset</button>
             </div>
         </main>
+        <div class="settings-panel" id="settings-panel" hidden>
+            <h2 class="settings-panel__title">Timer settings</h2>
+            <label class="settings-panel__label">
+                Focus (minutes)
+                <input type="number" id="focus-min-input" min="1" max="90" value="25" class="settings-panel__input">
+            </label>
+            <label class="settings-panel__label">
+                Break (minutes)
+                <input type="number" id="break-min-input" min="1" max="30" value="5" class="settings-panel__input">
+            </label>
+            <div class="settings-panel__actions">
+                <button type="button" class="control-button control-button--primary" id="settings-save-btn">Save</button>
+                <button type="button" class="control-button control-button--secondary" id="settings-cancel-btn">Cancel</button>
+            </div>
+        </div>
     </div>
     <script type="module" src="/src/main.js"></script>
 </body>
