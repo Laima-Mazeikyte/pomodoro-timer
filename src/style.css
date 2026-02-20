@@ -117,6 +117,33 @@ body[data-mode="paused"] {
   --color-border: #2d3842;
 }
 
+/* ----- Mode switch flash (in-the-moment visual cue) ----- */
+@keyframes mode-switch-flash-fade {
+  0% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+body.mode-switch-flash::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: mode-switch-flash-fade 0.45s ease-out forwards;
+}
+
+body[data-mode="focus"].mode-switch-flash::after {
+  background: var(--color-focus);
+}
+
+body[data-mode="break"].mode-switch-flash::after {
+  background: var(--color-break);
+}
+
 /* ----- Reset ----- */
 *,
 *::before,
@@ -172,8 +199,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-xl);
+  gap: clamp(var(--space-lg), 4vw, var(--space-xl));
   width: 100%;
+  max-width: 100%;
+  padding: 0 var(--space-sm);
+  box-sizing: border-box;
 }
 
 .pomodoro-timer__header {
@@ -185,7 +215,7 @@ body {
 }
 
 .mode-indicator {
-  font-size: var(--text-lg);
+  font-size: clamp(var(--text-base), 2.5vw, var(--text-lg));
   font-weight: var(--font-medium);
   color: var(--color-focus-muted);
   letter-spacing: 0.05em;
@@ -194,11 +224,12 @@ body {
 
 .time-display {
   font-family: var(--font-mono);
-  font-size: var(--text-timer);
+  font-size: clamp(var(--text-timer-sm), 12vw, var(--text-timer));
   font-weight: var(--font-bold);
   line-height: var(--leading-tight);
   color: var(--color-focus);
   letter-spacing: 0.02em;
+  text-align: center;
 }
 
 /* Mode-specific theme (data-mode set on #app from JavaScript) */
@@ -291,7 +322,7 @@ body {
 
 .timer-controls {
   display: flex;
-  gap: var(--space-md);
+  gap: clamp(var(--space-sm), 2vw, var(--space-md));
   margin-top: var(--space-sm);
   align-items: center;
 }
@@ -632,9 +663,9 @@ body {
   margin: 0;
 }
 
-.settings-panel__input:focus {
-  outline: none;
-  border-color: var(--color-idle);
+.settings-panel__input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* Visually hidden but available to screen readers */
