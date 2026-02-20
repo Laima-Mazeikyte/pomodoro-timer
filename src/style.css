@@ -356,15 +356,9 @@ body {
 }
 
 /* Reset button uses the current state colorway (border + icon color) */
+/* Idle: only start/play is shown; reset is hidden */
 #app[data-mode="idle"] #reset-btn {
-  border-color: var(--color-idle);
-  color: var(--color-idle);
-}
-
-#app[data-mode="idle"] #reset-btn:hover {
-  border-color: var(--color-idle-hover);
-  color: var(--color-idle-hover);
-  background: var(--color-idle-glow);
+  display: none !important;
 }
 
 #app[data-mode="focus"] #reset-btn {
@@ -529,34 +523,25 @@ body {
 
 .settings-panel__actions {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   margin-top: var(--space-lg);
   justify-content: flex-start;
 }
 
-/* Settings Save/Cancel: same outline style as reset button (no fill, border + color). Override primary/secondary fills. */
+/* Settings Save/Cancel: neutral (idle) colorway, regular font weight. */
 .settings-panel__actions .control-button.control-button--primary,
 .settings-panel__actions .control-button.control-button--secondary {
   background: none !important;
-  border: var(--border-button) solid var(--color-border);
-  color: var(--color-text-muted);
+  border: var(--border-button) solid var(--color-idle);
+  color: var(--color-idle);
+  font-weight: var(--font-normal);
 }
 
-.settings-panel__actions .control-button.control-button--secondary:hover {
-  color: var(--color-text);
-  background: var(--color-idle-glow) !important;
-  border-color: var(--color-border);
-}
-
-.settings-panel__actions .control-button.control-button--primary {
-  border-color: var(--color-focus);
-  color: var(--color-focus);
-}
-
+.settings-panel__actions .control-button.control-button--secondary:hover,
 .settings-panel__actions .control-button.control-button--primary:hover {
-  background: var(--color-focus-glow) !important;
-  border-color: var(--color-focus-hover);
-  color: var(--color-focus-hover);
+  color: var(--color-idle-hover);
+  background: var(--color-idle-glow) !important;
+  border-color: var(--color-idle-hover);
 }
 
 .settings-panel__group {
@@ -568,7 +553,7 @@ body {
 
 .settings-panel__label-text {
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--color-idle);
   text-align: left;
 }
 
@@ -587,26 +572,27 @@ body {
   border-radius: var(--radius-md);
   border: var(--border-button) solid var(--color-border);
   background-color: var(--color-surface);
-  color: var(--color-text-muted);
+  color: var(--color-idle);
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
 
 .settings-panel__preset:hover {
-  color: var(--color-text);
-  background-color: var(--color-border);
+  color: var(--color-idle-hover);
+  background-color: var(--color-idle-glow);
+  border-color: var(--color-border);
 }
 
 .settings-panel__preset[aria-pressed="true"] {
-  background-color: var(--color-focus-muted);
-  border-color: var(--color-focus);
-  color: var(--color-focus);
+  background-color: var(--color-idle-muted);
+  border-color: var(--color-idle);
+  color: var(--color-idle);
 }
 
 .settings-panel__preset--custom[aria-pressed="true"] {
-  background-color: var(--color-focus-muted);
-  border-color: var(--color-focus);
-  color: var(--color-focus);
+  background-color: var(--color-idle-muted);
+  border-color: var(--color-idle);
+  color: var(--color-idle);
 }
 
 #focus-custom-wrap,
@@ -624,7 +610,7 @@ body {
   flex-direction: column;
   gap: var(--space-xs);
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--color-idle);
 }
 
 .settings-panel__input {
@@ -634,7 +620,7 @@ body {
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background-color: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-idle);
   width: 100%;
   -moz-appearance: textfield;
   appearance: textfield;
@@ -648,7 +634,7 @@ body {
 
 .settings-panel__input:focus {
   outline: none;
-  border-color: var(--color-focus);
+  border-color: var(--color-idle);
 }
 
 /* Visually hidden but available to screen readers */
