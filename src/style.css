@@ -51,7 +51,7 @@
 
   /* ----- Typography ----- */
   --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", monospace;
+  --font-mono: "Roboto Mono", "Fira Code", "SF Mono", monospace;
 
   --text-xs: 0.75rem;    /* 12px */
   --text-sm: 0.875rem;   /* 14px */
@@ -195,7 +195,7 @@ body {
 .time-display {
   font-family: var(--font-mono);
   font-size: var(--text-timer);
-  font-weight: var(--font-medium);
+  font-weight: var(--font-bold);
   line-height: var(--leading-tight);
   color: var(--color-focus);
   letter-spacing: 0.02em;
@@ -489,7 +489,7 @@ body {
 .settings-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xl);
   width: 100%;
   max-width: min(360px, 100% - var(--space-xl) * 2);
 }
@@ -512,9 +512,10 @@ body {
 #app.settings-open .settings-panel:not([hidden]) {
   display: flex;
   flex: 1;
+  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  padding: var(--space-lg) 0;
+  align-items: flex-start;
+  padding: var(--space-xl) 0;
   width: max-content;
   max-width: calc(100% - var(--space-lg) * 2);
 }
@@ -529,28 +530,53 @@ body {
 .settings-panel__actions {
   display: flex;
   gap: var(--space-md);
-  margin-top: var(--space-sm);
-  justify-content: center;
+  margin-top: var(--space-lg);
+  justify-content: flex-start;
+}
+
+/* Settings Save/Cancel: same outline style as reset button (no fill, border + color). Override primary/secondary fills. */
+.settings-panel__actions .control-button.control-button--primary,
+.settings-panel__actions .control-button.control-button--secondary {
+  background: none !important;
+  border: var(--border-button) solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.settings-panel__actions .control-button.control-button--secondary:hover {
+  color: var(--color-text);
+  background: var(--color-idle-glow) !important;
+  border-color: var(--color-border);
+}
+
+.settings-panel__actions .control-button.control-button--primary {
+  border-color: var(--color-focus);
+  color: var(--color-focus);
+}
+
+.settings-panel__actions .control-button.control-button--primary:hover {
+  background: var(--color-focus-glow) !important;
+  border-color: var(--color-focus-hover);
+  color: var(--color-focus-hover);
 }
 
 .settings-panel__group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  align-items: center;
+  gap: var(--space-md);
+  align-items: flex-start;
 }
 
 .settings-panel__label-text {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  text-align: center;
+  text-align: left;
 }
 
 .settings-panel__presets {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .settings-panel__preset {
