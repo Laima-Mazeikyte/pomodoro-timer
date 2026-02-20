@@ -12,23 +12,23 @@
   /* ----- State colorways ----- */
   /* Each state has: base, muted (35%), glow (15%), hover */
 
-  /* Idle – neutral cool gray (waiting to start) */
-  --color-idle: #9a9a94;
-  --color-idle-muted: rgba(154, 154, 148, 0.35);
-  --color-idle-glow: rgba(154, 154, 148, 0.15);
-  --color-idle-hover: #acabA5;
+  /* Idle – warm gray (waiting to start) */
+  --color-idle: #a09689;
+  --color-idle-muted: rgba(160, 150, 137, 0.35);
+  --color-idle-glow: rgba(160, 150, 137, 0.15);
+  --color-idle-hover: #b0a699;
 
-  /* Focus – bright yellow (active concentration) */
-  --color-focus: #f5c542;
-  --color-focus-muted: rgba(245, 197, 66, 0.35);
-  --color-focus-glow: rgba(245, 197, 66, 0.15);
-  --color-focus-hover: #f7d054;
+  /* Focus – warm amber (active concentration) */
+  --color-focus: #d9a030;
+  --color-focus-muted: rgba(217, 160, 48, 0.35);
+  --color-focus-glow: rgba(217, 160, 48, 0.15);
+  --color-focus-hover: #e0ad42;
 
-  /* Break – warm mossy green (rest period) */
-  --color-break: #7d8a6a;
-  --color-break-muted: rgba(125, 138, 106, 0.35);
-  --color-break-glow: rgba(125, 138, 106, 0.15);
-  --color-break-hover: #8e9b7b;
+  /* Break – warm olive green (rest period) */
+  --color-break: #6a7850;
+  --color-break-muted: rgba(106, 120, 80, 0.35);
+  --color-break-glow: rgba(106, 120, 80, 0.15);
+  --color-break-hover: #7a8860;
 
   /* Paused – bluish gray (temporarily stopped) */
   --color-paused: #7b9bb3;
@@ -83,11 +83,11 @@
 /* Each mode gets its own background family matching its accent color */
 
 body[data-mode="idle"] {
-  /* Neutral gray tones (matches --color-idle) */
-  --color-bg: #1a1a18;
-  --color-surface: #222220;
-  --color-surface-elevated: #2c2c28;
-  --color-border: #3a3a35;
+  /* Warm gray tones (matches --color-idle) */
+  --color-bg: #1a1916;
+  --color-surface: #23211c;
+  --color-surface-elevated: #2d2a24;
+  --color-border: #3b3830;
 }
 
 body[data-mode="focus"] {
@@ -99,11 +99,11 @@ body[data-mode="focus"] {
 }
 
 body[data-mode="break"] {
-  /* Warm mossy green tones (matches --color-break) */
-  --color-bg: #181a16;
-  --color-surface: #1f221c;
-  --color-surface-elevated: #282c24;
-  --color-border: #363d30;
+  /* Warm olive green tones (matches --color-break) */
+  --color-bg: #171914;
+  --color-surface: #1e201a;
+  --color-surface-elevated: #272a22;
+  --color-border: #353a2c;
 }
 
 body[data-mode="paused"] {
