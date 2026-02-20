@@ -1,7 +1,7 @@
 /* Pomodoro Timer – Design tokens */
 
 :root {
-  /* ----- Colors (dark theme, default = Focus) ----- */
+  /* ----- Base colors (dark theme) ----- */
   --color-bg: #1c1912;
   --color-surface: #252218;
   --color-surface-elevated: #2f2a1f;
@@ -9,19 +9,32 @@
   --color-text-muted: #8b8b96;
   --color-border: #3d3829;
 
-  /* Work mode (focus) – bright yellow */
-  --color-work: #f5c542;
-  --color-work-muted: rgba(245, 197, 66, 0.35);
-  --color-work-glow: rgba(245, 197, 66, 0.15);
+  /* ----- State colorways ----- */
+  /* Each state has: base, muted (35%), glow (15%), hover */
 
-  /* Break mode (rest) – calm mossy green */
-  --color-break: #6b8e6b;
-  --color-break-muted: rgba(107, 142, 107, 0.35);
-  --color-break-glow: rgba(107, 142, 107, 0.15);
+  /* Idle – neutral cool gray (waiting to start) */
+  --color-idle: #9a9a94;
+  --color-idle-muted: rgba(154, 154, 148, 0.35);
+  --color-idle-glow: rgba(154, 154, 148, 0.15);
+  --color-idle-hover: #acabA5;
 
-  /* Paused state – bluish gray */
+  /* Focus – bright yellow (active concentration) */
+  --color-focus: #f5c542;
+  --color-focus-muted: rgba(245, 197, 66, 0.35);
+  --color-focus-glow: rgba(245, 197, 66, 0.15);
+  --color-focus-hover: #f7d054;
+
+  /* Break – warm mossy green (rest period) */
+  --color-break: #7d8a6a;
+  --color-break-muted: rgba(125, 138, 106, 0.35);
+  --color-break-glow: rgba(125, 138, 106, 0.15);
+  --color-break-hover: #8e9b7b;
+
+  /* Paused – bluish gray (temporarily stopped) */
   --color-paused: #7b9bb3;
   --color-paused-muted: rgba(123, 155, 179, 0.35);
+  --color-paused-glow: rgba(123, 155, 179, 0.15);
+  --color-paused-hover: #8fa9be;
 
   /* Semantic */
   --color-success: #5cb85c;
@@ -66,8 +79,19 @@
   --radius-full: 9999px;  /* pill / circle */
 }
 
-/* Per-state background and section colors (same family as accent) */
-body[data-mode="work"] {
+/* ----- Per-state background palettes ----- */
+/* Each mode gets its own background family matching its accent color */
+
+body[data-mode="idle"] {
+  /* Neutral gray tones (matches --color-idle) */
+  --color-bg: #1a1a18;
+  --color-surface: #222220;
+  --color-surface-elevated: #2c2c28;
+  --color-border: #3a3a35;
+}
+
+body[data-mode="focus"] {
+  /* Warm amber tones (matches --color-focus) */
   --color-bg: #1c1912;
   --color-surface: #252218;
   --color-surface-elevated: #2f2a1f;
@@ -75,13 +99,15 @@ body[data-mode="work"] {
 }
 
 body[data-mode="break"] {
-  --color-bg: #121a14;
-  --color-surface: #1a2420;
-  --color-surface-elevated: #243028;
-  --color-border: #2e3d36;
+  /* Warm mossy green tones (matches --color-break) */
+  --color-bg: #181a16;
+  --color-surface: #1f221c;
+  --color-surface-elevated: #282c24;
+  --color-border: #363d30;
 }
 
 body[data-mode="paused"] {
+  /* Cool blue tones (matches --color-paused) */
   --color-bg: #13181c;
   --color-surface: #1a2128;
   --color-surface-elevated: #242d36;
@@ -111,6 +137,7 @@ body {
 }
 
 #app {
+  position: relative;
   width: 100%;
   max-width: 480px;
   min-height: 100vh;
@@ -121,14 +148,22 @@ body {
   padding: var(--space-lg);
 }
 
-/* ----- Timer components ----- */
-.pomodoro-timer-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
+/* Settings button: fixed to viewport edge at all times */
+.app-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: var(--space-sm);
+  z-index: 10;
 }
+
+@media (min-width: 480px) {
+  .app-header {
+    padding: var(--space-md);
+  }
+}
+
+/* ----- Timer components ----- */
 
 .pomodoro-timer {
   display: flex;
@@ -149,7 +184,7 @@ body {
 .mode-indicator {
   font-size: var(--text-lg);
   font-weight: var(--font-medium);
-  color: var(--color-work-muted);
+  color: var(--color-focus-muted);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -159,7 +194,7 @@ body {
   font-size: var(--text-timer);
   font-weight: var(--font-medium);
   line-height: var(--leading-tight);
-  color: var(--color-work);
+  color: var(--color-focus);
   letter-spacing: 0.02em;
 }
 
@@ -185,7 +220,23 @@ body {
 }
 
 #app[data-mode="paused"] .control-button--primary:hover {
-  background-color: #8fa9be;
+  background-color: var(--color-paused-hover);
+}
+
+#app[data-mode="idle"] .mode-indicator {
+  color: var(--color-idle-muted);
+}
+
+#app[data-mode="idle"] .time-display {
+  color: var(--color-idle);
+}
+
+#app[data-mode="idle"] .control-button--primary {
+  background-color: var(--color-idle);
+}
+
+#app[data-mode="idle"] .control-button--primary:hover {
+  background-color: var(--color-idle-hover);
 }
 
 .timer-controls {
@@ -231,6 +282,10 @@ body {
   min-width: 2.5rem;
 }
 
+#reset-btn {
+  display: grid;
+}
+
 .control-button {
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -247,12 +302,12 @@ body {
 }
 
 .control-button--primary {
-  background-color: var(--color-work);
+  background-color: var(--color-focus);
   color: var(--color-text);
 }
 
 .control-button--primary:hover {
-  background-color: #f7d054;
+  background-color: var(--color-focus-hover);
 }
 
 #app[data-mode="break"] .control-button--primary {
@@ -260,7 +315,7 @@ body {
 }
 
 #app[data-mode="break"] .control-button--primary:hover {
-  background-color: #7fa87f;
+  background-color: var(--color-break-hover);
 }
 
 .control-button--secondary {
@@ -274,23 +329,78 @@ body {
   background-color: var(--color-border);
 }
 
-/* ----- Settings panel ----- */
+/* Tertiary: no background by default, hover only (e.g. Settings) */
+.control-button--tertiary {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+}
+
+.control-button--tertiary:hover {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text);
+}
+
+.control-button--tertiary:active {
+  background-color: var(--color-border);
+}
+
+/* Settings: same size as other icon buttons, tighter padding for a squarer look */
+.settings-btn {
+  padding: var(--space-xs);
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+}
+
+#settings-btn {
+  display: grid;
+  flex-wrap: wrap;
+  vertical-align: middle;
+}
+
+#start-pause-btn {
+  display: grid;
+}
+
+/* ----- Settings (full-page view, not a modal) ----- */
 .settings-panel {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: var(--space-xl);
-  width: 100%;
-  max-width: 320px;
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  width: 100%;
+  max-width: min(360px, 100% - var(--space-xl) * 2);
 }
 
-/* When hidden attribute is set, hide the panel (overrides display: flex above) */
 .settings-panel[hidden] {
   display: none !important;
+}
+
+/* When settings is open: hide timer, show settings as full page */
+#app.settings-open .pomodoro-timer {
+  display: none !important;
+}
+
+#app.settings-open {
+  justify-content: center;
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+}
+
+#app.settings-open .settings-panel:not([hidden]) {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-lg) 0;
+  width: max-content;
+  max-width: calc(100% - var(--space-lg) * 2);
+}
+
+@media (min-width: 480px) {
+  #app.settings-open .settings-panel:not([hidden]) {
+    padding: var(--space-xl) 0;
+    max-width: calc(100% - var(--space-xl) * 2);
+  }
 }
 
 .settings-panel__actions {
@@ -315,7 +425,7 @@ body {
 
 .settings-panel__presets {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: var(--space-sm);
   justify-content: center;
 }
@@ -339,15 +449,15 @@ body {
 }
 
 .settings-panel__preset[aria-pressed="true"] {
-  background-color: var(--color-work-muted);
-  border-color: var(--color-work);
-  color: var(--color-work);
+  background-color: var(--color-focus-muted);
+  border-color: var(--color-focus);
+  color: var(--color-focus);
 }
 
 .settings-panel__preset--custom[aria-pressed="true"] {
-  background-color: var(--color-work-muted);
-  border-color: var(--color-work);
-  color: var(--color-work);
+  background-color: var(--color-focus-muted);
+  border-color: var(--color-focus);
+  color: var(--color-focus);
 }
 
 #focus-custom-wrap,
@@ -389,7 +499,7 @@ body {
 
 .settings-panel__input:focus {
   outline: none;
-  border-color: var(--color-work);
+  border-color: var(--color-focus);
 }
 
 /* Visually hidden but available to screen readers */
@@ -407,6 +517,6 @@ body {
 
 /* ----- Focus (accessibility) ----- */
 :focus-visible {
-  outline: 2px solid var(--color-work);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }

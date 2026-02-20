@@ -10,7 +10,7 @@ const BREAK_MAX = 999;
 const FOCUS_PRESETS = [60, 30, 45, 25, 20];
 const BREAK_PRESETS = [5, 10, 15, 20];
 
-let workDurationSec = DEFAULT_FOCUS_MIN * 60;
+let focusDurationSec = DEFAULT_FOCUS_MIN * 60;
 let breakDurationSec = DEFAULT_BREAK_MIN * 60;
 
 function loadDurationsFromStorage() {
@@ -18,7 +18,7 @@ function loadDurationsFromStorage() {
   const breakMin = parseInt(localStorage.getItem(BREAK_STORAGE_KEY), 10);
   const focus = Number.isNaN(focusMin) ? DEFAULT_FOCUS_MIN : Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, focusMin));
   const break_ = Number.isNaN(breakMin) ? DEFAULT_BREAK_MIN : Math.max(BREAK_MIN, Math.min(BREAK_MAX, breakMin));
-  workDurationSec = focus * 60;
+  focusDurationSec = focus * 60;
   breakDurationSec = break_ * 60;
 }
 
@@ -27,14 +27,14 @@ function saveDurationsToStorage(focusMin, breakMin) {
   const break_ = Math.max(BREAK_MIN, Math.min(BREAK_MAX, Math.round(Number(breakMin)) || DEFAULT_BREAK_MIN));
   localStorage.setItem(FOCUS_STORAGE_KEY, String(focus));
   localStorage.setItem(BREAK_STORAGE_KEY, String(break_));
-  workDurationSec = focus * 60;
+  focusDurationSec = focus * 60;
   breakDurationSec = break_ * 60;
 }
 
 // State
-let timeRemaining = workDurationSec; // seconds
+let timeRemaining = focusDurationSec; // seconds
 let isRunning = false;
-let currentMode = 'work'; // 'work' | 'break'
+let currentMode = 'focus'; // 'focus' | 'break'
 let intervalId = null;
 let hasStarted = false; // true after user has pressed Play at least once
 
@@ -113,9 +113,9 @@ function restoreFullView() {
   if (minimizedView) minimizedView.hidden = true;
 }
 
-/** Set visual theme from current mode. Call when switching work, break, or paused. */
+/** Set visual theme from current mode. Call when switching focus, break, paused, or idle. */
 export function setMode(mode) {
-  if (mode === 'work' || mode === 'break' || mode === 'paused') {
+  if (mode === 'focus' || mode === 'break' || mode === 'paused' || mode === 'idle') {
     app.dataset.mode = mode;
     document.body.dataset.mode = mode;
   }
@@ -130,7 +130,7 @@ function formatTime(seconds) {
 
 /** Update mode label for screen readers and display. */
 function getModeLabel(mode) {
-  return mode === 'work' ? 'Focus' : 'Break';
+  return mode === 'focus' ? 'Focus' : 'Break';
 }
 
 /** Broadcast state to mini popup if open (no-op if not used). */
@@ -141,7 +141,7 @@ function updateDOM() {
   const formatted = formatTime(timeRemaining);
   timeDisplay.textContent = formatted;
 
-  const displayMode = isRunning ? currentMode : 'paused';
+  const displayMode = isRunning ? currentMode : (hasStarted ? 'paused' : 'idle');
   setMode(displayMode);
   modeIndicator.textContent = getModeLabel(currentMode);
 
@@ -159,18 +159,18 @@ function updateDOM() {
   broadcastState();
 }
 
-/** Start the next phase (work or break) with correct duration. */
+/** Start the next phase (focus or break) with correct duration. */
 function startPhase(mode) {
   currentMode = mode;
-  timeRemaining = mode === 'work' ? workDurationSec : breakDurationSec;
+  timeRemaining = mode === 'focus' ? focusDurationSec : breakDurationSec;
   updateDOM();
 }
 
 /** Called every second when timer is running. */
 function tick() {
   if (timeRemaining <= 0) {
-    // Auto-switch: work -> break, break -> work
-    startPhase(currentMode === 'work' ? 'break' : 'work');
+    // Auto-switch: focus -> break, break -> focus
+    startPhase(currentMode === 'focus' ? 'break' : 'focus');
     return;
   }
   timeRemaining -= 1;
@@ -191,7 +191,7 @@ function toggleStartPause() {
   updateDOM();
 }
 
-/** Stop timer and reset to work mode with full work duration. */
+/** Stop timer and reset to focus mode with full focus duration. */
 function reset() {
   hasStarted = false;
   isRunning = false;
@@ -199,7 +199,7 @@ function reset() {
     clearInterval(intervalId);
     intervalId = null;
   }
-  startPhase('work');
+  startPhase('focus');
 }
 
 function setCustomInputFocusable(input, focusable) {
@@ -227,7 +227,7 @@ function selectFocusPreset(minutes) {
 }
 
 function selectFocusCustom() {
-  if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, Math.round(workDurationSec / 60) || DEFAULT_FOCUS_MIN));
+  if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, Math.round(focusDurationSec / 60) || DEFAULT_FOCUS_MIN));
   if (focusCustomWrap) focusCustomWrap.hidden = false;
   setCustomInputFocusable(focusMinInput, true);
   settingsPanel.querySelectorAll('[data-focus-preset], [data-focus-custom]').forEach((btn) => {
@@ -260,7 +260,7 @@ function selectBreakCustom() {
 }
 
 function openSettings() {
-  const focusMin = Math.round(workDurationSec / 60);
+  const focusMin = Math.round(focusDurationSec / 60);
   const breakMin = Math.round(breakDurationSec / 60);
   if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, focusMin));
   if (breakMinInput) breakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, breakMin));
@@ -275,10 +275,12 @@ function openSettings() {
     selectBreakCustom();
   }
   if (settingsPanel) settingsPanel.hidden = false;
+  if (app) app.classList.add('settings-open');
 }
 
 function closeSettings() {
   if (settingsPanel) settingsPanel.hidden = true;
+  if (app) app.classList.remove('settings-open');
 }
 
 function toggleSettings() {
@@ -324,6 +326,6 @@ if (settingsPanel) {
 
 // Optional: save popup position when it closes (popup would need to postMessage; skip for simplicity)
 
-// Initial state: load saved durations, work mode, full duration, not running
+// Initial state: load saved durations, focus mode, full duration, not running
 loadDurationsFromStorage();
-startPhase('work');
+startPhase('focus');
