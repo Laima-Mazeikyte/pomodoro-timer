@@ -77,6 +77,9 @@
   --radius-lg: 0.75rem;   /* 12px */
   --radius-xl: 1rem;      /* 16px */
   --radius-full: 9999px;  /* pill / circle */
+
+  /* ----- Button border ----- */
+  --border-button: 0.5px;
 }
 
 /* ----- Per-state background palettes ----- */
@@ -236,7 +239,7 @@ body {
 
 #app[data-mode="break"] .control-button--primary.control-button--icon {
   background: none;
-  border: 1px solid var(--color-break);
+  border: var(--border-button) solid var(--color-break);
   color: var(--color-break);
 }
 
@@ -248,7 +251,7 @@ body {
 
 #app[data-mode="paused"] .control-button--primary.control-button--icon {
   background: none;
-  border: 1px solid var(--color-paused);
+  border: var(--border-button) solid var(--color-paused);
   color: var(--color-paused);
 }
 
@@ -260,7 +263,7 @@ body {
 
 #app[data-mode="idle"] .control-button--primary.control-button--icon {
   background: none;
-  border: 1px solid var(--color-idle);
+  border: var(--border-button) solid var(--color-idle);
   color: var(--color-idle);
 }
 
@@ -329,7 +332,7 @@ body {
   padding: var(--space-xs);
   min-width: 2.25rem;
   min-height: 2.25rem;
-  border: 1px solid var(--color-border);
+  border: var(--border-button) solid var(--color-border);
   display: grid;
   place-items: center;
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
@@ -342,7 +345,7 @@ body {
 /* Play/Pause icon button: no fill, border + icon color from state */
 .control-button--primary.control-button--icon {
   background: none;
-  border: 1px solid var(--color-focus);
+  border: var(--border-button) solid var(--color-focus);
   color: var(--color-focus);
 }
 
@@ -432,12 +435,21 @@ body {
 .control-button--secondary {
   background-color: var(--color-surface-elevated);
   color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
+  border: var(--border-button) solid var(--color-border);
 }
 
 .control-button--secondary:hover {
   color: var(--color-text);
   background-color: var(--color-border);
+}
+
+/* Icon-style secondary (e.g. Reset): no background, same as other icon buttons */
+.control-button--secondary.control-button--icon {
+  background: none;
+}
+
+.control-button--secondary.control-button--icon:hover {
+  background: none; /* state-specific #reset-btn:hover sets glow */
 }
 
 /* Tertiary: no background by default, hover only (e.g. Settings) */
@@ -547,7 +559,7 @@ body {
   font-weight: var(--font-medium);
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border: var(--border-button) solid var(--color-border);
   background-color: var(--color-surface);
   color: var(--color-text-muted);
   cursor: pointer;
