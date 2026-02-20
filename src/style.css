@@ -223,6 +223,53 @@ body {
   background-color: var(--color-paused-hover);
 }
 
+#app[data-mode="focus"] .control-button--primary.control-button--icon {
+  border-color: var(--color-focus);
+  color: var(--color-focus);
+}
+
+#app[data-mode="focus"] .control-button--primary.control-button--icon:hover {
+  border-color: var(--color-focus-hover);
+  color: var(--color-focus-hover);
+  background: var(--color-focus-glow);
+}
+
+#app[data-mode="break"] .control-button--primary.control-button--icon {
+  background: none;
+  border: 1px solid var(--color-break);
+  color: var(--color-break);
+}
+
+#app[data-mode="break"] .control-button--primary.control-button--icon:hover {
+  background: var(--color-break-glow);
+  border-color: var(--color-break-hover);
+  color: var(--color-break-hover);
+}
+
+#app[data-mode="paused"] .control-button--primary.control-button--icon {
+  background: none;
+  border: 1px solid var(--color-paused);
+  color: var(--color-paused);
+}
+
+#app[data-mode="paused"] .control-button--primary.control-button--icon:hover {
+  background: var(--color-paused-glow);
+  border-color: var(--color-paused-hover);
+  color: var(--color-paused-hover);
+}
+
+#app[data-mode="idle"] .control-button--primary.control-button--icon {
+  background: none;
+  border: 1px solid var(--color-idle);
+  color: var(--color-idle);
+}
+
+#app[data-mode="idle"] .control-button--primary.control-button--icon:hover {
+  background: var(--color-idle-glow);
+  border-color: var(--color-idle-hover);
+  color: var(--color-idle-hover);
+}
+
 #app[data-mode="idle"] .mode-indicator {
   color: var(--color-idle-muted);
 }
@@ -275,15 +322,79 @@ body {
   display: inline-flex;
 }
 
-/* Icon-only buttons: same shape as Settings (Play/Pause, Reset, Settings) */
+/* Icon-only buttons: no background, slight border, hug the icon */
 .control-button--icon,
 .settings-btn {
-  padding: var(--space-sm);
-  min-width: 2.5rem;
+  background: none;
+  padding: var(--space-xs);
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border: 1px solid var(--color-border);
+  display: grid;
+  place-items: center;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
 }
 
 #reset-btn {
   display: grid;
+}
+
+/* Play/Pause icon button: no fill, border + icon color from state */
+.control-button--primary.control-button--icon {
+  background: none;
+  border: 1px solid var(--color-focus);
+  color: var(--color-focus);
+}
+
+.control-button--primary.control-button--icon:hover {
+  background: var(--color-focus-glow);
+  border-color: var(--color-focus-hover);
+  color: var(--color-focus-hover);
+}
+
+/* Reset button uses the current state colorway (border + icon color) */
+#app[data-mode="idle"] #reset-btn {
+  border-color: var(--color-idle);
+  color: var(--color-idle);
+}
+
+#app[data-mode="idle"] #reset-btn:hover {
+  border-color: var(--color-idle-hover);
+  color: var(--color-idle-hover);
+  background: var(--color-idle-glow);
+}
+
+#app[data-mode="focus"] #reset-btn {
+  border-color: var(--color-focus);
+  color: var(--color-focus);
+}
+
+#app[data-mode="focus"] #reset-btn:hover {
+  border-color: var(--color-focus-hover);
+  color: var(--color-focus-hover);
+  background: var(--color-focus-glow);
+}
+
+#app[data-mode="break"] #reset-btn {
+  border-color: var(--color-break);
+  color: var(--color-break);
+}
+
+#app[data-mode="break"] #reset-btn:hover {
+  border-color: var(--color-break-hover);
+  color: var(--color-break-hover);
+  background: var(--color-break-glow);
+}
+
+#app[data-mode="paused"] #reset-btn {
+  border-color: var(--color-paused);
+  color: var(--color-paused);
+}
+
+#app[data-mode="paused"] #reset-btn:hover {
+  border-color: var(--color-paused-hover);
+  color: var(--color-paused-hover);
+  background: var(--color-paused-glow);
 }
 
 .control-button {
