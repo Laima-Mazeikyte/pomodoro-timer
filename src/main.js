@@ -46,6 +46,9 @@ let timeRemaining = focusDurationSec; // seconds
 let isRunning = false;
 let currentMode = 'focus'; // 'focus' | 'break' | 'longBreak'
 let focusSessionsCompleted = 0;
+let totalFocusCompleted = 0;
+let totalShortBreaksCompleted = 0;
+let totalLongBreaksCompleted = 0;
 let intervalId = null;
 let hasStarted = false; // true after user has pressed Play at least once
 
@@ -175,6 +178,73 @@ function getFaviconKey(displayMode, currentMode) {
 /** Broadcast state to mini popup if open (no-op if not used). */
 function broadcastState() {}
 
+/**
+ * One line = one classic set: F, B, F, B, F, B, F, LB.
+ * Indicators appear on status change: we show completed phases plus the current phase.
+ * After long break we clear (new set) and show only the first focus indicator.
+ */
+function getCurrentSetCounts() {
+  const setIndex = totalLongBreaksCompleted;
+  const completedFocus = Math.min(4, Math.max(0, totalFocusCompleted - 4 * setIndex));
+  const focus = Math.min(4, completedFocus + (currentMode === 'focus' ? 1 : 0));
+  const completedShortBreak = Math.min(3, Math.max(0, totalShortBreaksCompleted - 3 * setIndex));
+  const shortBreak = Math.min(3, completedShortBreak + (currentMode === 'break' ? 1 : 0));
+  const longBreak = currentMode === 'longBreak' ? 1 : 0;
+  return { focus, shortBreak, longBreak };
+}
+
+/** Build ordered list for current set: F, B, F, B, F, B, F, LB. */
+function getCurrentSetDotsOrder() {
+  const { focus, shortBreak, longBreak } = getCurrentSetCounts();
+  const order = [];
+  let fi = 0;
+  let bi = 0;
+  for (let i = 0; i < 4; i++) {
+    if (fi < focus) {
+      order.push('focus');
+      fi++;
+    }
+    if (i < 3 && bi < shortBreak) {
+      order.push('break');
+      bi++;
+    }
+  }
+  if (longBreak > 0) order.push('longBreak');
+  return order;
+}
+
+/** Render session dots (and pills for long breaks) into #session-dots. Shows only the current set. Hidden in idle state. */
+function renderSessionDots() {
+  const container = document.getElementById('session-dots');
+  if (!container) return;
+  if (!hasStarted) {
+    container.hidden = true;
+    container.replaceChildren();
+    return;
+  }
+  const types = getCurrentSetDotsOrder();
+  container.hidden = types.length === 0;
+  if (types.length === 0) {
+    container.replaceChildren();
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  for (const type of types) {
+    if (type === 'longBreak') {
+      const pill = document.createElement('span');
+      pill.className = 'session-dots__pill';
+      pill.setAttribute('aria-hidden', 'true');
+      fragment.appendChild(pill);
+    } else {
+      const dot = document.createElement('span');
+      dot.className = 'session-dots__dot session-dots__dot--' + (type === 'focus' ? 'focus' : 'break');
+      dot.setAttribute('aria-hidden', 'true');
+      fragment.appendChild(dot);
+    }
+  }
+  container.replaceChildren(fragment);
+}
+
 /** Refresh all timer UI from state. */
 function updateDOM() {
   const formatted = formatTime(timeRemaining);
@@ -197,6 +267,7 @@ function updateDOM() {
     resetBtn.tabIndex = hasStarted ? 0 : -1;
   }
 
+  renderSessionDots();
   broadcastState();
   document.title = getTabTitle();
 }
@@ -330,19 +401,31 @@ function triggerModeSwitchNotifications() {
   playModeSwitchSound();
 }
 
+/** Complete current phase and start the next. Totals reflect the phase we just completed (indicators appear on status change). */
+function completeCurrentPhaseAndGoToNext() {
+  let nextMode;
+  if (currentMode === 'focus') {
+    focusSessionsCompleted += 1;
+    nextMode = focusSessionsCompleted === 4 ? 'longBreak' : 'break';
+    if (nextMode === 'longBreak') focusSessionsCompleted = 0;
+  } else {
+    nextMode = 'focus';
+  }
+  if (currentMode === 'focus') {
+    totalFocusCompleted += 1;
+  } else if (currentMode === 'break') {
+    totalShortBreaksCompleted += 1;
+  } else if (currentMode === 'longBreak') {
+    totalLongBreaksCompleted += 1;
+  }
+  startPhase(nextMode);
+  triggerModeSwitchNotifications();
+}
+
 /** Called every second when timer is running. */
 function tick() {
   if (timeRemaining <= 0) {
-    let nextMode;
-    if (currentMode === 'focus') {
-      focusSessionsCompleted += 1;
-      nextMode = focusSessionsCompleted === 4 ? 'longBreak' : 'break';
-      if (nextMode === 'longBreak') focusSessionsCompleted = 0;
-    } else {
-      nextMode = 'focus';
-    }
-    startPhase(nextMode);
-    triggerModeSwitchNotifications();
+    completeCurrentPhaseAndGoToNext();
     return;
   }
   // Soft countdown tick when 5, 4, 3, 2, or 1 seconds left (descending pitch; phase-change sound plays at 0)
@@ -377,6 +460,9 @@ function reset() {
   hasStarted = false;
   isRunning = false;
   focusSessionsCompleted = 0;
+  totalFocusCompleted = 0;
+  totalShortBreaksCompleted = 0;
+  totalLongBreaksCompleted = 0;
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
@@ -556,6 +642,13 @@ if (settingsPanel) {
     else if (longBreakCustom) selectLongBreakCustom();
   });
 }
+
+// --- TEST: Skip to next phase (remove for production) ---
+const devSkipPhaseBtn = document.getElementById('dev-skip-phase-btn');
+if (devSkipPhaseBtn) {
+  devSkipPhaseBtn.addEventListener('click', completeCurrentPhaseAndGoToNext);
+}
+// --- end TEST ---
 
 // Optional: save popup position when it closes (popup would need to postMessage; skip for simplicity)
 
