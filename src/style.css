@@ -178,13 +178,16 @@ body {
   padding: var(--space-lg);
 }
 
-/* Settings button: fixed to viewport edge at all times */
+/* Header: fixed to viewport edge; flex layout for mute + settings buttons */
 .app-header {
   position: fixed;
   top: 0;
   right: 0;
   padding: var(--space-sm);
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 @media (min-width: 480px) {
@@ -547,17 +550,18 @@ body {
   background-color: var(--color-border);
 }
 
-/* Settings: same size as other icon buttons, tighter padding for a squarer look */
-.settings-btn {
+/* Header icon buttons (mute, settings): same size, tighter padding for a squarer look */
+.header-icon-btn {
   padding: var(--space-xs);
   min-width: 2.5rem;
   min-height: 2.5rem;
+  display: grid;
+  place-items: center;
 }
 
-#settings-btn {
-  display: grid;
-  flex-wrap: wrap;
-  vertical-align: middle;
+#mute-btn .mute-btn__icon--off[hidden],
+#mute-btn .mute-btn__icon--on[hidden] {
+  display: none !important;
 }
 
 #start-pause-btn {

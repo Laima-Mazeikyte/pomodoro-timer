@@ -2,6 +2,7 @@
 const FOCUS_STORAGE_KEY = 'pomodoro-focus-min';
 const BREAK_STORAGE_KEY = 'pomodoro-break-min';
 const LONG_BREAK_STORAGE_KEY = 'pomodoro-long-break-min';
+const SOUND_MUTED_STORAGE_KEY = 'pomodoro-sound-muted';
 const DEFAULT_FOCUS_MIN = 25;
 const DEFAULT_BREAK_MIN = 5;
 const DEFAULT_LONG_BREAK_MIN = 15;
@@ -51,6 +52,7 @@ let totalShortBreaksCompleted = 0;
 let totalLongBreaksCompleted = 0;
 let intervalId = null;
 let hasStarted = false; // true after user has pressed Play at least once
+let soundMuted = false;
 
 // DOM
 const app = document.getElementById('app');
@@ -63,6 +65,7 @@ const minimizedView = document.getElementById('minimized-view');
 const popoutBtn = document.getElementById('popout-btn');
 const restoreBtn = document.getElementById('restore-btn');
 const popupBlockedMessage = document.getElementById('popup-blocked-message');
+const muteBtn = document.getElementById('mute-btn');
 const settingsBtn = document.getElementById('settings-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const focusMinInput = document.getElementById('focus-min-input');
@@ -356,7 +359,7 @@ function playModeSwitchSound() {
 
 /** Play a soft rising interval when the user starts the timer (e.g. C to E). */
 function playStartSound() {
-  if (!audioContext) return;
+  if (soundMuted || !audioContext) return;
   const now = audioContext.currentTime;
   playWarmTone({
     frequency: 440,
@@ -381,7 +384,7 @@ const COUNTDOWN_PITCH_MAP = { 5: 640, 4: 560, 3: 480, 2: 420, 1: 360 };
 
 /** Play a soft tick for the last-5-seconds countdown; descending pitch only (no extra tone on 1). */
 function playCountdownTick(secondsLeft) {
-  if (!audioContext) return;
+  if (soundMuted || !audioContext) return;
   const frequency = COUNTDOWN_PITCH_MAP[secondsLeft] ?? 520;
   playWarmTone({
     frequency,
@@ -601,6 +604,27 @@ function toggleSettings() {
   }
 }
 
+function loadSoundMutedFromStorage() {
+  const stored = localStorage.getItem(SOUND_MUTED_STORAGE_KEY);
+  soundMuted = stored === 'true';
+}
+
+function updateMuteButtonUI() {
+  if (!muteBtn) return;
+  const iconOn = muteBtn.querySelector('.mute-btn__icon--on');
+  const iconOff = muteBtn.querySelector('.mute-btn__icon--off');
+  if (iconOn) iconOn.hidden = soundMuted;
+  if (iconOff) iconOff.hidden = !soundMuted;
+  muteBtn.setAttribute('aria-label', soundMuted ? 'Unmute sounds' : 'Mute sounds');
+  muteBtn.setAttribute('aria-pressed', String(soundMuted));
+}
+
+function toggleMute() {
+  soundMuted = !soundMuted;
+  localStorage.setItem(SOUND_MUTED_STORAGE_KEY, String(soundMuted));
+  updateMuteButtonUI();
+}
+
 function saveSettings() {
   const focusMin = focusMinInput ? focusMinInput.value : '';
   const breakMin = breakMinInput ? breakMinInput.value : '';
@@ -617,6 +641,7 @@ startPauseBtn.addEventListener('click', toggleStartPause);
 resetBtn.addEventListener('click', reset);
 if (popoutBtn) popoutBtn.addEventListener('click', openMiniPopup);
 if (restoreBtn) restoreBtn.addEventListener('click', restoreFullView);
+if (muteBtn) muteBtn.addEventListener('click', toggleMute);
 if (settingsBtn) settingsBtn.addEventListener('click', toggleSettings);
 if (settingsSaveBtn) settingsSaveBtn.addEventListener('click', saveSettings);
 if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettings);
@@ -647,4 +672,6 @@ if (settingsPanel) {
 
 // Initial state: load saved durations, focus mode, full duration, not running
 loadDurationsFromStorage();
+loadSoundMutedFromStorage();
+updateMuteButtonUI();
 startPhase('focus');
