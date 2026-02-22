@@ -136,6 +136,24 @@ function getModeLabel(mode) {
   return mode === 'focus' ? 'Focus' : 'Break';
 }
 
+/** Return tab title string from current state (idle / running / paused). Label at end. */
+function getTabTitle() {
+  if (!hasStarted) return 'Start Pomo';
+  const label = getModeLabel(currentMode);
+  const time = formatTime(timeRemaining);
+  // Time first, then label (e.g. "24:59 Focus")
+  return isRunning ? time + ' ' + label : time + ' (paused) ' + label;
+}
+
+/** Bump this when you replace favicon files so browsers load the new assets. */
+const FAVICON_VERSION = 3;
+
+/** Return favicon state key for current display mode and phase (idle, focus, break, paused-focus, paused-break). */
+function getFaviconKey(displayMode, currentMode) {
+  if (displayMode === 'paused') return 'paused-' + currentMode;
+  return displayMode;
+}
+
 /** Broadcast state to mini popup if open (no-op if not used). */
 function broadcastState() {}
 
@@ -146,6 +164,8 @@ function updateDOM() {
 
   const displayMode = isRunning ? currentMode : (hasStarted ? 'paused' : 'idle');
   setMode(displayMode);
+  const favicon = document.querySelector('link#favicon');
+  if (favicon) favicon.href = '/favicon-' + getFaviconKey(displayMode, currentMode) + '.svg?v=' + FAVICON_VERSION;
   modeIndicator.textContent = getModeLabel(currentMode);
 
   // Start/Pause: swap icon by state (only play or only pause visible)
@@ -160,6 +180,7 @@ function updateDOM() {
   }
 
   broadcastState();
+  document.title = getTabTitle();
 }
 
 /** Start the next phase (focus or break) with correct duration. */

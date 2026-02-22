@@ -13,20 +13,20 @@
   /* Each state has: base, muted (35%), glow (15%), hover */
 
   /* Idle – warm gray (waiting to start) */
-  --color-idle: #a09689;
+  --color-idle: #7b9bb3;
   --color-idle-muted: rgba(160, 150, 137, 0.35);
   --color-idle-glow: rgba(160, 150, 137, 0.15);
   --color-idle-hover: #b0a699;
 
   /* Focus – warm amber (active concentration) */
-  --color-focus: #d9a030;
-  --color-focus-muted: rgba(217, 160, 48, 0.35);
-  --color-focus-glow: rgba(217, 160, 48, 0.15);
+  --color-focus: #7EC4E7;
+  --color-focus-muted: #d9a03059;
+  --color-focus-glow: lab(69.55% 11.26 62.56 / 0.149);
   --color-focus-hover: #e0ad42;
 
   /* Break – warm olive green (rest period) */
   --color-break: #6a7850;
-  --color-break-muted: rgba(106, 120, 80, 0.35);
+  --color-break-muted: #6a785059;
   --color-break-glow: rgba(106, 120, 80, 0.15);
   --color-break-hover: #7a8860;
 
