@@ -643,13 +643,6 @@ if (settingsPanel) {
   });
 }
 
-// --- TEST: Skip to next phase (remove for production) ---
-const devSkipPhaseBtn = document.getElementById('dev-skip-phase-btn');
-if (devSkipPhaseBtn) {
-  devSkipPhaseBtn.addEventListener('click', completeCurrentPhaseAndGoToNext);
-}
-// --- end TEST ---
-
 // Optional: save popup position when it closes (popup would need to postMessage; skip for simplicity)
 
 // Initial state: load saved durations, focus mode, full duration, not running

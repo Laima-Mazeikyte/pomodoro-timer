@@ -320,6 +320,15 @@ body {
   background-color: var(--color-idle-hover);
 }
 
+/* Placeholder gap so layout doesn’t jump when session-dots appear after start */
+.session-dots-wrap {
+  min-height: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 /* Session dots: only current set (up to 8 items) on one row */
 .session-dots {
   --dot-size: 8px;
@@ -371,14 +380,6 @@ body {
   margin-top: 8px;
   align-items: center;
 }
-
-/* TEST: Skip to next phase - remove for production */
-.timer-controls--dev {
-  margin-top: var(--space-xs, 0.25rem);
-  opacity: 0.7;
-  font-size: 0.875rem;
-}
-/* end TEST */
 
 .control-button__icon {
   display: inline-flex;
