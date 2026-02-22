@@ -199,7 +199,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(var(--space-lg), 4vw, var(--space-xl));
+  gap: 24px;
   width: 100%;
   max-width: 100%;
   padding: 0 var(--space-sm);
@@ -339,6 +339,7 @@ body {
 }
 
 .session-dots__dot {
+  box-sizing: border-box;
   width: var(--dot-size);
   height: var(--dot-size);
   border-radius: 999px;
@@ -367,7 +368,7 @@ body {
 .timer-controls {
   display: flex;
   gap: clamp(var(--space-sm), 2vw, var(--space-md));
-  margin-top: var(--space-sm);
+  margin-top: 8px;
   align-items: center;
 }
 
