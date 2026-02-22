@@ -43,7 +43,7 @@
         <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-heading">
             <h2 id="settings-heading" class="visually-hidden">Timer settings</h2>
             <div class="settings-panel__group" role="group" aria-labelledby="focus-label">
-                <span class="settings-panel__label-text" id="focus-label">Focus time (minutes)</span>
+                <span class="settings-panel__label-text" id="focus-label">Focus duration (minutes)</span>
                 <div class="settings-panel__presets" role="group" aria-label="Focus duration presets">
                     <button type="button" class="settings-panel__preset" data-focus-preset="25" aria-pressed="false">25</button>
                     <button type="button" class="settings-panel__preset" data-focus-preset="30" aria-pressed="false">30</button>
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="settings-panel__group" role="group" aria-labelledby="break-label">
-                <span class="settings-panel__label-text" id="break-label">Break time (minutes)</span>
+                <span class="settings-panel__label-text" id="break-label">Break duration (minutes)</span>
                 <div class="settings-panel__presets" role="group" aria-label="Break duration presets">
                     <button type="button" class="settings-panel__preset" data-break-preset="5" aria-pressed="false">5</button>
                     <button type="button" class="settings-panel__preset" data-break-preset="10" aria-pressed="false">10</button>
@@ -70,6 +70,21 @@
                     <input type="number" id="break-min-input" min="1" max="999" value="5" class="settings-panel__input" aria-label="Break duration (minutes)">
                 </div>
             </div>
+            <div class="settings-panel__group" role="group" aria-labelledby="long-break-label">
+                <span class="settings-panel__label-text" id="long-break-label">Long break duration (minutes)</span>
+                <div class="settings-panel__presets" role="group" aria-label="Long break duration presets">
+                    <button type="button" class="settings-panel__preset" data-long-break-preset="5" aria-pressed="false">5</button>
+                    <button type="button" class="settings-panel__preset" data-long-break-preset="10" aria-pressed="false">10</button>
+                    <button type="button" class="settings-panel__preset" data-long-break-preset="15" aria-pressed="false">15</button>
+                    <button type="button" class="settings-panel__preset" data-long-break-preset="20" aria-pressed="false">20</button>
+                    <button type="button" class="settings-panel__preset settings-panel__preset--custom" data-long-break-custom aria-pressed="false">Custom</button>
+                </div>
+                <div id="long-break-custom-wrap" hidden>
+                    <label class="settings-panel__label visually-hidden" for="long-break-min-input">Long break duration (minutes)</label>
+                    <input type="number" id="long-break-min-input" min="1" max="999" value="15" class="settings-panel__input" aria-label="Long break duration (minutes)">
+                </div>
+            </div>
+            <p class="settings-panel__notice" id="settings-apply-notice" hidden aria-live="polite"></p>
             <div class="settings-panel__actions">
                 <button type="button" class="control-button control-button--primary" id="settings-save-btn">Save</button>
                 <button type="button" class="control-button control-button--secondary" id="settings-cancel-btn">Cancel</button>

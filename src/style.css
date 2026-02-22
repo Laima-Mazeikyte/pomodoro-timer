@@ -552,10 +552,21 @@ body {
   }
 }
 
+.settings-panel__notice {
+  font-size: var(--text-sm);
+  color: var(--color-idle);
+  margin: 16px 0 0 0;
+  line-height: 1.4;
+}
+
+.settings-panel__notice[hidden] {
+  display: none;
+}
+
 .settings-panel__actions {
   display: flex;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
+  margin-top: 0;
   justify-content: flex-start;
 }
 
@@ -627,12 +638,14 @@ body {
 }
 
 #focus-custom-wrap,
-#break-custom-wrap {
+#break-custom-wrap,
+#long-break-custom-wrap {
   width: 100%;
 }
 
 #focus-custom-wrap[hidden],
-#break-custom-wrap[hidden] {
+#break-custom-wrap[hidden],
+#long-break-custom-wrap[hidden] {
   display: none !important;
 }
 

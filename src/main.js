@@ -1,40 +1,51 @@
 // Pomodoro Timer – duration config & persistence
 const FOCUS_STORAGE_KEY = 'pomodoro-focus-min';
 const BREAK_STORAGE_KEY = 'pomodoro-break-min';
+const LONG_BREAK_STORAGE_KEY = 'pomodoro-long-break-min';
 const DEFAULT_FOCUS_MIN = 25;
 const DEFAULT_BREAK_MIN = 5;
+const DEFAULT_LONG_BREAK_MIN = 15;
 const FOCUS_MIN = 1;
 const FOCUS_MAX = 999;
 const BREAK_MIN = 1;
 const BREAK_MAX = 999;
 const FOCUS_PRESETS = [60, 30, 45, 25, 20];
 const BREAK_PRESETS = [5, 10, 15, 20];
+const LONG_BREAK_PRESETS = [5, 10, 15, 20];
 
 let focusDurationSec = DEFAULT_FOCUS_MIN * 60;
 let breakDurationSec = DEFAULT_BREAK_MIN * 60;
+let longBreakDurationSec = DEFAULT_LONG_BREAK_MIN * 60;
 
 function loadDurationsFromStorage() {
   const focusMin = parseInt(localStorage.getItem(FOCUS_STORAGE_KEY), 10);
   const breakMin = parseInt(localStorage.getItem(BREAK_STORAGE_KEY), 10);
+  const longBreakMin = parseInt(localStorage.getItem(LONG_BREAK_STORAGE_KEY), 10);
   const focus = Number.isNaN(focusMin) ? DEFAULT_FOCUS_MIN : Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, focusMin));
   const break_ = Number.isNaN(breakMin) ? DEFAULT_BREAK_MIN : Math.max(BREAK_MIN, Math.min(BREAK_MAX, breakMin));
+  const longBreak = Number.isNaN(longBreakMin) ? DEFAULT_LONG_BREAK_MIN : Math.max(BREAK_MIN, Math.min(BREAK_MAX, longBreakMin));
   focusDurationSec = focus * 60;
   breakDurationSec = break_ * 60;
+  longBreakDurationSec = longBreak * 60;
 }
 
-function saveDurationsToStorage(focusMin, breakMin) {
+function saveDurationsToStorage(focusMin, breakMin, longBreakMin) {
   const focus = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, Math.round(Number(focusMin)) || DEFAULT_FOCUS_MIN));
   const break_ = Math.max(BREAK_MIN, Math.min(BREAK_MAX, Math.round(Number(breakMin)) || DEFAULT_BREAK_MIN));
+  const longBreak = Math.max(BREAK_MIN, Math.min(BREAK_MAX, Math.round(Number(longBreakMin)) || DEFAULT_LONG_BREAK_MIN));
   localStorage.setItem(FOCUS_STORAGE_KEY, String(focus));
   localStorage.setItem(BREAK_STORAGE_KEY, String(break_));
+  localStorage.setItem(LONG_BREAK_STORAGE_KEY, String(longBreak));
   focusDurationSec = focus * 60;
   breakDurationSec = break_ * 60;
+  longBreakDurationSec = longBreak * 60;
 }
 
 // State
 let timeRemaining = focusDurationSec; // seconds
 let isRunning = false;
-let currentMode = 'focus'; // 'focus' | 'break'
+let currentMode = 'focus'; // 'focus' | 'break' | 'longBreak'
+let focusSessionsCompleted = 0;
 let intervalId = null;
 let hasStarted = false; // true after user has pressed Play at least once
 
@@ -53,10 +64,13 @@ const settingsBtn = document.getElementById('settings-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const focusMinInput = document.getElementById('focus-min-input');
 const breakMinInput = document.getElementById('break-min-input');
+const longBreakMinInput = document.getElementById('long-break-min-input');
 const focusCustomWrap = document.getElementById('focus-custom-wrap');
 const breakCustomWrap = document.getElementById('break-custom-wrap');
+const longBreakCustomWrap = document.getElementById('long-break-custom-wrap');
 const settingsSaveBtn = document.getElementById('settings-save-btn');
 const settingsCancelBtn = document.getElementById('settings-cancel-btn');
+const settingsApplyNotice = document.getElementById('settings-apply-notice');
 
 const MINI_POPUP_NAME = 'pomodoro-mini';
 const MINI_POPUP_WIDTH = 220;
@@ -118,9 +132,11 @@ function restoreFullView() {
 
 /** Set visual theme from current mode. Call when switching focus, break, paused, or idle. */
 export function setMode(mode) {
-  if (mode === 'focus' || mode === 'break' || mode === 'paused' || mode === 'idle') {
-    app.dataset.mode = mode;
-    document.body.dataset.mode = mode;
+  if (mode === 'focus' || mode === 'break' || mode === 'longBreak' || mode === 'paused' || mode === 'idle') {
+    // Long break uses same colourway as break
+    const themeMode = mode === 'longBreak' ? 'break' : mode;
+    app.dataset.mode = themeMode;
+    document.body.dataset.mode = themeMode;
   }
 }
 
@@ -133,7 +149,9 @@ function formatTime(seconds) {
 
 /** Update mode label for screen readers and display. */
 function getModeLabel(mode) {
-  return mode === 'focus' ? 'Focus' : 'Break';
+  if (mode === 'focus') return 'Focus';
+  if (mode === 'longBreak') return 'Long break';
+  return 'Break';
 }
 
 /** Return tab title string from current state (idle / running / paused). Label at end. */
@@ -148,10 +166,10 @@ function getTabTitle() {
 /** Bump this when you replace favicon files so browsers load the new assets. */
 const FAVICON_VERSION = 3;
 
-/** Return favicon state key for current display mode and phase (idle, focus, break, paused-focus, paused-break). */
+/** Return favicon state key for current display mode and phase (idle, focus, break, paused-focus, paused-break). Long break uses break favicon. */
 function getFaviconKey(displayMode, currentMode) {
-  if (displayMode === 'paused') return 'paused-' + currentMode;
-  return displayMode;
+  const faviconMode = currentMode === 'longBreak' ? 'break' : currentMode;
+  return displayMode === 'paused' ? 'paused-' + faviconMode : faviconMode;
 }
 
 /** Broadcast state to mini popup if open (no-op if not used). */
@@ -183,10 +201,16 @@ function updateDOM() {
   document.title = getTabTitle();
 }
 
-/** Start the next phase (focus or break) with correct duration. */
+/** Start the next phase (focus, break, or long break) with correct duration. */
 function startPhase(mode) {
   currentMode = mode;
-  timeRemaining = mode === 'focus' ? focusDurationSec : breakDurationSec;
+  if (mode === 'focus') {
+    timeRemaining = focusDurationSec;
+  } else if (mode === 'longBreak') {
+    timeRemaining = longBreakDurationSec;
+  } else {
+    timeRemaining = breakDurationSec;
+  }
   updateDOM();
 }
 
@@ -309,8 +333,14 @@ function triggerModeSwitchNotifications() {
 /** Called every second when timer is running. */
 function tick() {
   if (timeRemaining <= 0) {
-    // Auto-switch: focus -> break, break -> focus
-    const nextMode = currentMode === 'focus' ? 'break' : 'focus';
+    let nextMode;
+    if (currentMode === 'focus') {
+      focusSessionsCompleted += 1;
+      nextMode = focusSessionsCompleted === 4 ? 'longBreak' : 'break';
+      if (nextMode === 'longBreak') focusSessionsCompleted = 0;
+    } else {
+      nextMode = 'focus';
+    }
     startPhase(nextMode);
     triggerModeSwitchNotifications();
     return;
@@ -346,6 +376,7 @@ function toggleStartPause() {
 function reset() {
   hasStarted = false;
   isRunning = false;
+  focusSessionsCompleted = 0;
   if (intervalId) {
     clearInterval(intervalId);
     intervalId = null;
@@ -410,11 +441,36 @@ function selectBreakCustom() {
   breakMinInput?.focus();
 }
 
+function selectLongBreakPreset(minutes) {
+  const val = Math.max(BREAK_MIN, Math.min(BREAK_MAX, minutes));
+  if (longBreakMinInput) longBreakMinInput.value = val;
+  if (longBreakCustomWrap) longBreakCustomWrap.hidden = true;
+  setCustomInputFocusable(longBreakMinInput, false);
+  settingsPanel.querySelectorAll('[data-long-break-preset], [data-long-break-custom]').forEach((btn) => {
+    const isPreset = btn.hasAttribute('data-long-break-preset');
+    const match = isPreset && Number(btn.getAttribute('data-long-break-preset')) === val;
+    const isCustom = btn.hasAttribute('data-long-break-custom');
+    btn.setAttribute('aria-pressed', (!isCustom && match) || (isCustom && !LONG_BREAK_PRESETS.includes(val)) ? 'true' : 'false');
+  });
+}
+
+function selectLongBreakCustom() {
+  if (longBreakMinInput) longBreakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, Math.round(longBreakDurationSec / 60) || DEFAULT_LONG_BREAK_MIN));
+  if (longBreakCustomWrap) longBreakCustomWrap.hidden = false;
+  setCustomInputFocusable(longBreakMinInput, true);
+  settingsPanel.querySelectorAll('[data-long-break-preset], [data-long-break-custom]').forEach((btn) => {
+    btn.setAttribute('aria-pressed', btn.hasAttribute('data-long-break-custom') ? 'true' : 'false');
+  });
+  longBreakMinInput?.focus();
+}
+
 function openSettings() {
   const focusMin = Math.round(focusDurationSec / 60);
   const breakMin = Math.round(breakDurationSec / 60);
+  const longBreakMin = Math.round(longBreakDurationSec / 60);
   if (focusMinInput) focusMinInput.value = Math.max(FOCUS_MIN, Math.min(FOCUS_MAX, focusMin));
   if (breakMinInput) breakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, breakMin));
+  if (longBreakMinInput) longBreakMinInput.value = Math.max(BREAK_MIN, Math.min(BREAK_MAX, longBreakMin));
   if (FOCUS_PRESETS.includes(focusMin)) {
     selectFocusPreset(focusMin);
   } else {
@@ -424,6 +480,23 @@ function openSettings() {
     selectBreakPreset(breakMin);
   } else {
     selectBreakCustom();
+  }
+  if (LONG_BREAK_PRESETS.includes(longBreakMin)) {
+    selectLongBreakPreset(longBreakMin);
+  } else {
+    selectLongBreakCustom();
+  }
+  if (settingsApplyNotice) {
+    if (!hasStarted) {
+      settingsApplyNotice.hidden = true;
+      settingsApplyNotice.textContent = '';
+    } else {
+      settingsApplyNotice.hidden = false;
+      settingsApplyNotice.textContent =
+        currentMode === 'focus'
+          ? 'Changes apply from your next focus session.'
+          : 'Changes apply from your next break.';
+    }
   }
   if (settingsPanel) settingsPanel.hidden = false;
   if (app) app.classList.add('settings-open');
@@ -445,7 +518,8 @@ function toggleSettings() {
 function saveSettings() {
   const focusMin = focusMinInput ? focusMinInput.value : '';
   const breakMin = breakMinInput ? breakMinInput.value : '';
-  saveDurationsToStorage(focusMin, breakMin);
+  const longBreakMin = longBreakMinInput ? longBreakMinInput.value : '';
+  saveDurationsToStorage(focusMin, breakMin, longBreakMin);
   if (!isRunning) {
     startPhase(currentMode);
   }
@@ -462,16 +536,24 @@ if (settingsSaveBtn) settingsSaveBtn.addEventListener('click', saveSettings);
 if (settingsCancelBtn) settingsCancelBtn.addEventListener('click', closeSettings);
 if (settingsPanel) {
   settingsPanel.addEventListener('click', (e) => {
-    const target = e.target.closest('button');
-    if (!target || !target.classList.contains('settings-panel__preset')) return;
+    let target = e.target;
+    while (target && target !== settingsPanel) {
+      if (target.nodeType === 1 && target.tagName === 'BUTTON' && target.classList.contains('settings-panel__preset')) break;
+      target = target.parentElement;
+    }
+    if (!target || target === settingsPanel) return;
     const focusPreset = target.getAttribute('data-focus-preset');
     const focusCustom = target.hasAttribute('data-focus-custom');
     const breakPreset = target.getAttribute('data-break-preset');
     const breakCustom = target.hasAttribute('data-break-custom');
+    const longBreakPreset = target.getAttribute('data-long-break-preset');
+    const longBreakCustom = target.hasAttribute('data-long-break-custom');
     if (focusPreset != null) selectFocusPreset(Number(focusPreset));
     else if (focusCustom) selectFocusCustom();
     else if (breakPreset != null) selectBreakPreset(Number(breakPreset));
     else if (breakCustom) selectBreakCustom();
+    else if (longBreakPreset != null) selectLongBreakPreset(Number(longBreakPreset));
+    else if (longBreakCustom) selectLongBreakCustom();
   });
 }
 
