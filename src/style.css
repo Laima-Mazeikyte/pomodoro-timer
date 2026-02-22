@@ -320,12 +320,64 @@ body {
   background-color: var(--color-idle-hover);
 }
 
+/* Session dots: only current set (up to 8 items) on one row */
+.session-dots {
+  --dot-size: 8px;
+  --focus-width: 8px;
+  --focus-height: 8px;
+  --pill-width: 16px;
+  --pill-height: 8px;
+  --session-dots-gap: 8px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--session-dots-gap);
+  /* One set = 4 focus + 3 break + 1 pill + 7 gaps */
+  max-width: calc(4 * var(--focus-width) + 3 * var(--dot-size) + var(--pill-width) + 7 * var(--session-dots-gap));
+  opacity: 1;
+}
+
+.session-dots__dot {
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.session-dots__dot--focus {
+  width: var(--focus-width);
+  height: var(--focus-height);
+  border-radius: 999px;
+  background-color: var(--color-focus);
+}
+
+.session-dots__dot--break {
+  background-color: var(--color-break);
+}
+
+.session-dots__pill {
+  width: var(--pill-width);
+  height: var(--pill-height);
+  border-radius: 999px; /* horizontal pill */
+  background-color: var(--color-break);
+  flex-shrink: 0;
+}
+
 .timer-controls {
   display: flex;
   gap: clamp(var(--space-sm), 2vw, var(--space-md));
   margin-top: var(--space-sm);
   align-items: center;
 }
+
+/* TEST: Skip to next phase - remove for production */
+.timer-controls--dev {
+  margin-top: var(--space-xs, 0.25rem);
+  opacity: 0.7;
+  font-size: 0.875rem;
+}
+/* end TEST */
 
 .control-button__icon {
   display: inline-flex;
