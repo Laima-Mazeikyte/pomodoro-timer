@@ -1,8 +1,8 @@
-#Pomo widget 
+# Pomo widget 
 
 A simple and familiar Pomodoro style timer, 
 
-##functions
+## functions
 * Classic Pomodoro Focus, Break, Long Break countdowns
 * Long break after 4 Focus
 * Ability to customize Focus, Break, Long break lenght
